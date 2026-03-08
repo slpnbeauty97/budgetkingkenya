@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Global base styles */
+html, body {
+  height: 100%;
+}
+
+body {
+  background: linear-gradient(to bottom right, #0f172a, #000000);
+  color: white;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
