@@ -25,6 +25,7 @@ export default function MainLayout() {
             <Link to="/paye" className="hover:text-white transition">PAYE</Link>
             <Link to="/vat" className="hover:text-white transition">VAT</Link>
             <Link to="/loan" className="hover:text-white transition">Loan</Link>
+ <Link to="/investments" className="hover:text-white">Investments</Link> {/* 👈 new */}
           </nav>
 
           <button className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-xl text-sm font-semibold transition">

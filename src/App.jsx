@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import MainLayout from "./Layout/MainLayout";
 
-
 import Budget from "./pages/Budget"
 import Home from "./pages/Home"
 import NetPay from "./pages/NetPay"
@@ -11,6 +10,7 @@ import Loan from "./pages/Loan"
 import HousingLevy from "./pages/HousingLevy"
 import Nssf from "./pages/Nssf"
 import BusinessProfit from "./pages/BusinessProfit"
+import Investments from "./pages/Investments"  // 👈 new
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Route element={<MainLayout />}>
 
           <Route path="/" element={<Home />} />
-<Route path="/budget" element={<Budget />} />
+          <Route path="/budget" element={<Budget />} />
           <Route path="/netpay" element={<NetPay />} />
           <Route path="/paye" element={<Paye />} />
           <Route path="/vat" element={<Vat />} />
@@ -27,6 +27,7 @@ function App() {
           <Route path="/housing" element={<HousingLevy />} />
           <Route path="/nssf" element={<Nssf />} />
           <Route path="/business" element={<BusinessProfit />} />
+          <Route path="/investments" element={<Investments />} />  {/* 👈 new */}
 
         </Route>
       </Routes>

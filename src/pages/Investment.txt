@@ -1,0 +1,393 @@
+import { useState, useEffect } from "react"
+import jsPDF from "jspdf"
+import axios from "axios"
+
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from "recharts"
+
+/* ---------- SECTION ---------- */
+
+function Section({ title, icon, children }) {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="bg-[#111827] rounded-2xl border border-gray-800 overflow-hidden shadow-xl">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex justify-between items-center px-6 py-4 bg-[#1f2937]"
+      >
+        <div className="flex gap-3 font-semibold text-lg">
+          <span>{icon}</span>
+          {title}
+        </div>
+        <span>{open ? "▴" : "▾"}</span>
+      </button>
+
+      {open && <div className="p-6">{children}</div>}
+    </div>
+  )
+}
+
+/* ---------- INPUT ---------- */
+
+function InputRow({ label, value, onChange }) {
+  return (
+    <div className="flex flex-col gap-2 bg-[#0f172a] p-4 rounded-xl border border-gray-800">
+      <label className="text-sm text-gray-300">{label}</label>
+
+      <div className="flex">
+        <div className="bg-gray-800 px-3 flex items-center rounded-l-xl border border-r-0 border-gray-700 text-sm">
+          KES
+        </div>
+
+        <input
+          type="number"
+          value={value}
+          onChange={e => onChange(Number(e.target.value))}
+          className="w-full bg-gray-900 border border-gray-700 rounded-r-xl p-3 text-right"
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ---------- MAIN ---------- */
+
+export default function InvestmentDashboard() {
+
+  /* -------- PORTFOLIO -------- */
+
+  const [portfolio, setPortfolio] = useState({
+    stocks: 0,
+    bonds: 0,
+    treasuryBills: 0,
+    moneyMarket: 0,
+    crypto: 0,
+    cash: 0
+  })
+
+  /* -------- LIABILITIES -------- */
+
+  const [liabilities, setLiabilities] = useState({
+    loans: 0,
+    creditCards: 0,
+    mortgage: 0
+  })
+
+  /* -------- ECONOMICS -------- */
+
+  const [macro, setMacro] = useState({
+    inflation: 6.5,
+    expectedReturn: 8
+  })
+
+  /* -------- TREASURY YIELDS -------- */
+
+  const [treasuryYield, setTreasuryYield] = useState(12)
+
+  useEffect(() => {
+    const fetchYield = async () => {
+      try {
+
+        /* placeholder until CBK API used */
+
+        const yieldRate = 12
+        setTreasuryYield(yieldRate)
+
+      } catch (e) {
+        console.log("yield fetch error")
+      }
+    }
+
+    fetchYield()
+  }, [])
+
+  /* -------- HELPERS -------- */
+
+  const sum = obj =>
+    Object.values(obj).reduce((a, b) => a + Number(b || 0), 0)
+
+  const assets = sum(portfolio)
+  const debt = sum(liabilities)
+
+  const netWorth = assets - debt
+
+  /* -------- RETURNS -------- */
+
+  const realReturn =
+    ((1 + macro.expectedReturn / 100) /
+      (1 + macro.inflation / 100) -
+      1)
+
+  /* -------- GROWTH -------- */
+
+  const growthData = []
+
+  for (let i = 0; i <= 30; i++) {
+    growthData.push({
+      year: i,
+      value: Math.round(
+        assets * Math.pow(1 + realReturn, i)
+      )
+    })
+  }
+
+  /* -------- PIE DATA -------- */
+
+  const pieData = [
+    { name: "Stocks", value: portfolio.stocks },
+    { name: "Bonds", value: portfolio.bonds },
+    { name: "Treasury Bills", value: portfolio.treasuryBills },
+    { name: "Money Market", value: portfolio.moneyMarket },
+    { name: "Crypto", value: portfolio.crypto },
+    { name: "Cash", value: portfolio.cash }
+  ]
+
+  const COLORS = [
+    "#3B82F6",
+    "#10B981",
+    "#F59E0B",
+    "#6366F1",
+    "#EF4444",
+    "#9CA3AF"
+  ]
+
+  /* -------- FIRE CALC -------- */
+
+  const annualExpenses = 300000
+
+  const fireNumber = annualExpenses * 25
+
+  const yearsToFire =
+    assets > 0
+      ? Math.log(fireNumber / assets) /
+        Math.log(1 + realReturn)
+      : 0
+
+  /* -------- REBALANCE -------- */
+
+  const rebalance = () => {
+
+    const target = {
+      stocks: 0.6,
+      bonds: 0.2,
+      treasuryBills: 0.1,
+      moneyMarket: 0.05,
+      crypto: 0.03,
+      cash: 0.02
+    }
+
+    let suggestions = []
+
+    Object.keys(target).forEach(asset => {
+
+      const actual = portfolio[asset] / assets
+
+      if (Math.abs(actual - target[asset]) > 0.05) {
+        suggestions.push(
+          `Adjust ${asset} allocation`
+        )
+      }
+
+    })
+
+    if (suggestions.length === 0)
+      suggestions.push("Portfolio balanced")
+
+    return suggestions
+  }
+
+  /* -------- ROBO ADVISOR -------- */
+
+  const robo = () => {
+
+    let tips = []
+
+    if (macro.inflation > 6)
+      tips.push("Inflation high → favor equities")
+
+    if (portfolio.cash > assets * 0.2)
+      tips.push("Excess idle cash detected")
+
+    if (treasuryYield > 10)
+      tips.push("Treasury yields attractive")
+
+    return tips
+  }
+
+  /* -------- MPESA -------- */
+
+  const investMpesa = () => {
+    alert("M-Pesa investment trigger")
+  }
+
+  /* -------- PDF -------- */
+
+  const exportPDF = () => {
+
+    const doc = new jsPDF()
+
+    doc.text("Wealth Dashboard Report", 20, 20)
+    doc.text(`Net Worth: ${netWorth}`, 20, 40)
+    doc.text(`FIRE Number: ${fireNumber}`, 20, 50)
+
+    doc.save("wealth-report.pdf")
+  }
+
+  const renderGrid = (data, setter) => (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Object.entries(data).map(([k, v]) => (
+        <InputRow
+          key={k}
+          label={k}
+          value={v}
+          onChange={val =>
+            setter(prev => ({ ...prev, [k]: val }))
+          }
+        />
+      ))}
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-[#020617] text-white flex justify-center">
+
+      <div className="w-full max-w-7xl p-10 space-y-8">
+
+        <div className="rounded-3xl border border-blue-900 p-8 bg-gradient-to-r from-blue-900 to-purple-900">
+          <h1 className="text-3xl font-bold">
+            Wealth Management Dashboard
+          </h1>
+        </div>
+
+        <Section title="Investment Portfolio" icon="📊">
+          {renderGrid(portfolio, setPortfolio)}
+        </Section>
+
+        <Section title="Liabilities" icon="💳">
+          {renderGrid(liabilities, setLiabilities)}
+        </Section>
+
+        <Section title="Economic Factors" icon="🌍">
+          {renderGrid(macro, setMacro)}
+        </Section>
+
+        <div className="grid md:grid-cols-2 gap-6">
+
+          <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+            <h2 className="text-lg mb-4">Net Worth</h2>
+            <h1 className="text-3xl font-bold">
+              KES {netWorth.toLocaleString()}
+            </h1>
+          </div>
+
+          <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+            <h2 className="text-lg mb-4">Treasury Yield (Kenya)</h2>
+            <h1 className="text-3xl font-bold">
+              {treasuryYield}%
+            </h1>
+          </div>
+
+        </div>
+
+        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <h2 className="text-xl mb-4">Portfolio Allocation</h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                outerRadius={110}
+                label
+              >
+                {pieData.map((e, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <h2 className="text-xl mb-4">Wealth Growth Projection</h2>
+
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={growthData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                dataKey="value"
+                stroke="#22c55e"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <h2 className="text-xl mb-3">FIRE Calculator</h2>
+
+          <p>Target Net Worth: KES {fireNumber.toLocaleString()}</p>
+
+          <p>
+            Estimated Years to FIRE:
+            {yearsToFire.toFixed(1)}
+          </p>
+        </div>
+
+        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <h2 className="text-xl mb-3">Rebalancing Suggestions</h2>
+
+          {rebalance().map((s, i) => (
+            <p key={i}>• {s}</p>
+          ))}
+        </div>
+
+        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+          <h2 className="text-xl mb-3">Robo Advisor</h2>
+
+          {robo().map((tip, i) => (
+            <p key={i}>• {tip}</p>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+
+          <button
+            onClick={investMpesa}
+            className="bg-green-600 py-4 rounded-xl font-semibold"
+          >
+            Invest via M-Pesa
+          </button>
+
+          <button
+            onClick={exportPDF}
+            className="bg-blue-600 py-4 rounded-xl font-semibold"
+          >
+            Export Wealth Report
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  )
+}
