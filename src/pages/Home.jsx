@@ -18,7 +18,7 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full bg-gray-800/90 backdrop-blur-md z-50 border-b border-gray-700">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="text-2xl font-bold">Kenya Calc</div>
+          <div className="text-2xl font-bold">Be the king of your budget</div>
 
           {/* Desktop Links */}
           <div className="hidden md:flex space-x-6">
