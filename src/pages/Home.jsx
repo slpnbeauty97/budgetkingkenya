@@ -6,11 +6,12 @@ export default function Home() {
 
   const navLinks = [
     ["Home", "/"],
-    ["Net Pay", "/netpay"],
-    ["PAYE", "/paye"],
-    ["VAT", "/vat"],
-    ["Loan", "/loan"],
-    ["Investments, "/investments"],
+   [
+  ["Net Pay", "/netpay"],
+  ["PAYE", "/paye"],
+  ["VAT", "/vat"],
+  ["Loan", "/loan"],
+  ["Investments", "/investments"], 
   ]
 
   return (
