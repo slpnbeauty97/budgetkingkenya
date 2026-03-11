@@ -10,6 +10,7 @@ export default function Home() {
     ["PAYE", "/paye"],
     ["VAT", "/vat"],
     ["Loan", "/loan"],
+    ["Investments, "investments"],
   ]
 
   return (
