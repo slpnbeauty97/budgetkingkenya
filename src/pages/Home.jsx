@@ -1,9 +1,8 @@
-import { Link } from "react-router-dom"
-import { useState, useEffect, useRef } from "react"
+import { Link } from "react-router-dom";
+import { useState } from "react";
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef(null)
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
     ["Home", "/"],
@@ -12,20 +11,7 @@ export default function Home() {
     ["VAT", "/vat"],
     ["Loan", "/loan"],
     ["Investments", "/investments"]
-  ]
-
-  // Close mobile menu if clicked outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+  ];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -62,10 +48,7 @@ export default function Home() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div
-            ref={menuRef}
-            className="md:hidden bg-gray-800 border-t border-gray-700"
-          >
+          <div className="md:hidden bg-gray-800 border-t border-gray-700">
             {navLinks.map(([name, path]) => (
               <Link
                 key={path}
@@ -104,23 +87,19 @@ export default function Home() {
 
         {/* Right Side */}
         <div className="bg-gray-900/60 backdrop-blur-xl p-8 rounded-3xl border border-gray-800 shadow-2xl space-y-4">
-          {[
-            ["Net Pay", "/netpay"],
-            ["PAYE", "/paye"],
-            ["VAT", "/vat"],
-            ["Loan", "/loan"],
-            ["Investments", "/investments"]
-          ].map(([name, path]) => (
-            <Link
-              key={path}
-              to={path}
-              className="block bg-gray-800 hover:bg-gray-700 transition p-4 rounded-xl border border-gray-700"
-            >
-              {name} Calculator
-            </Link>
-          ))}
+          {navLinks
+            .filter(([name]) => name !== "Home")
+            .map(([name, path]) => (
+              <Link
+                key={path}
+                to={path}
+                className="block bg-gray-800 hover:bg-gray-700 transition p-4 rounded-xl border border-gray-700"
+              >
+                {name} Calculator
+              </Link>
+            ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
