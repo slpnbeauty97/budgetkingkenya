@@ -1,18 +1,31 @@
 import { Link } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
 
   const navLinks = [
     ["Home", "/"],
-   [
-  ["Net Pay", "/netpay"],
-  ["PAYE", "/paye"],
-  ["VAT", "/vat"],
-  ["Loan", "/loan"],
-  ["Investments", "/investments"], 
+    ["Net Pay", "/netpay"],
+    ["PAYE", "/paye"],
+    ["VAT", "/vat"],
+    ["Loan", "/loan"],
+    ["Investments", "/investments"]
   ]
+
+  // Close mobile menu if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -49,13 +62,16 @@ export default function Home() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden bg-gray-800 border-t border-gray-700">
+          <div
+            ref={menuRef}
+            className="md:hidden bg-gray-800 border-t border-gray-700"
+          >
             {navLinks.map(([name, path]) => (
               <Link
                 key={path}
                 to={path}
                 className="block px-6 py-3 hover:bg-gray-700 transition"
-                onClick={() => setMenuOpen(false)} // close on click
+                onClick={() => setMenuOpen(false)}
               >
                 {name}
               </Link>
@@ -93,6 +109,7 @@ export default function Home() {
             ["PAYE", "/paye"],
             ["VAT", "/vat"],
             ["Loan", "/loan"],
+            ["Investments", "/investments"]
           ].map(([name, path]) => (
             <Link
               key={path}
