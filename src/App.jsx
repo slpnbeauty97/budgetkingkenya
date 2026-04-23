@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import MainLayout from "./Layout/MainLayout";
+import { useEffect } from "react"
+
+import MainLayout from "./Layout/MainLayout"
 
 import Budget from "./pages/Budget"
 import Home from "./pages/Home"
@@ -10,9 +12,18 @@ import Loan from "./pages/Loan"
 import HousingLevy from "./pages/HousingLevy"
 import Nssf from "./pages/Nssf"
 import BusinessProfit from "./pages/BusinessProfit"
-import Investments from "./pages/Investments"  // 👈 new
+import Investments from "./pages/Investments"
 
 function App() {
+
+  // 🔥 Wake up Render backend (prevents cold start delay feel)
+  useEffect(() => {
+    fetch("https://budgetkingkenya.onrender.com/ping")
+      .catch(() => {
+        // ignore errors (server may be waking up)
+      })
+  }, [])
+
   return (
     <Router>
       <Routes>
@@ -27,7 +38,7 @@ function App() {
           <Route path="/housing" element={<HousingLevy />} />
           <Route path="/nssf" element={<Nssf />} />
           <Route path="/business" element={<BusinessProfit />} />
-          <Route path="/investments" element={<Investments />} />  {/* 👈 new */}
+          <Route path="/investments" element={<Investments />} />
 
         </Route>
       </Routes>
